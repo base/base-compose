@@ -1,0 +1,28 @@
+{
+  "name": "base-compose",
+  "description": "Compose elements from multiple applications into one.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/base/base-compose",
+  "author": "Brian Woodward (https://github.com/doowb)",
+  "repository": "base/base-compose",
+  "bugs": {
+    "url": "https://github.com/base/base-compose/issues"
+  },
+  "license": "MIT",
+  "files": [
+    "index.js"
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*"
+  },
+  "keywords": []
+}
