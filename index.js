@@ -7,6 +7,12 @@
 
 'use strict';
 
-module.exports = function () {
-  // do stuff
+var CompositionHandler = require('./lib/composition-handler');
+
+module.exports = function (options) {
+  return function(app) {
+    this.define('compose', function(arr) {
+      return new CompositionHandler(this, arr);
+    });
+  };
 };
