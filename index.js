@@ -9,8 +9,32 @@
 
 var CompositionHandler = require('./lib/composition-handler');
 
+/**
+ * Expose `compose`
+ */
+
 module.exports = function (options) {
   return function(app) {
+
+    /**
+     * Setup a composition by passing in an array of generators to compose elements from.
+     *
+     * ```js
+     * var composition = app.compose(['a', 'b', 'c']);
+     *
+     * // most of the time, use chaining
+     * app.compose(['a', 'b', 'c'])
+     *   .data()
+     *   .options()
+     *   .views();
+     * ```
+     *
+     * @name .compose
+     * @param {Array} `generators` Array of generators to be composed.
+     * @return {Object} Instance of [CompositionHandler](#composition-handler-api)
+     * @api public
+     */
+
     this.define('compose', function(arr) {
       return new CompositionHandler(this, arr);
     });
