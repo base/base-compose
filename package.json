@@ -33,5 +33,20 @@
     "mocha": "*",
     "should": "*"
   },
-  "keywords": []
+  "keywords": [],
+  "verb": {
+    "related": {
+      "list": [
+        "base",
+        "base-tasks",
+        "base-generators",
+        "base-options",
+        "assemble-core",
+        "generate",
+        "update",
+        "verb",
+        "assemble"
+      ]
+    }
+  }
 }
