@@ -108,4 +108,34 @@ describe('base-compose', function() {
 
     assert.deepEqual(app._.engines, a._.engines);
   });
+
+  it('should allow using the iterator with the currently loaded generators', function() {
+    app.register('a', function(a) {});
+    app.register('b', function(b) {});
+
+    var output = [];
+
+    app.compose(['a', 'b'])
+      .iterator(function(gen) {
+        output.push(gen.name);
+      });
+
+    assert.deepEqual(output, ['a', 'b']);
+  });
+
+  it('should allow using the iterator with the custom specified generators', function() {
+    app.register('a', function(a) {});
+    app.register('b', function(b) {});
+    app.register('c', function(c) {});
+    app.register('d', function(d) {});
+
+    var output = [];
+
+    app.compose(['a', 'b'])
+      .iterator(['c', 'd'], function(gen) {
+        output.push(gen.name);
+      });
+
+    assert.deepEqual(output, ['c', 'd']);
+  });
 });
