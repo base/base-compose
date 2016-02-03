@@ -18,8 +18,8 @@ app.use(compose());
 
 ## API
 
-### [.compose](index.js#L38)
-Setup a composition by passing in an array of generators to compose elements from.
+### [.compose](index.js#L39)
+Setup a composition by passing in an array of generators to compose elements. If a generator cannot be found, an error will be thrown.
 
 
 **Params**
@@ -46,7 +46,7 @@ app.compose(['a', 'b', 'c'])
 
 ### Composition Handler API
 
-### [.data](lib/composition-handler.js#L44)
+### [.data](lib/composition-handler.js#L40)
 Merge the `cache.data` object from each generator onto the `app.cache.data` object.
 
 
@@ -70,7 +70,7 @@ console.log(app.cache.data);
 ```
 
 
-### [.engines](lib/composition-handler.js#L65)
+### [.engines](lib/composition-handler.js#L61)
 Merge the engines from each generator into the `app` engines.
 
 
@@ -87,7 +87,7 @@ app.compose(['a', 'b', 'c'])
 ```
 
 
-### [.helpers](lib/composition-handler.js#L85)
+### [.helpers](lib/composition-handler.js#L81)
 Merge the helpers from each generator into the `app` helpers.
 
 
@@ -104,7 +104,7 @@ app.compose(['a', 'b', 'c'])
 ```
 
 
-### [.options](lib/composition-handler.js#L112)
+### [.options](lib/composition-handler.js#L108)
 Merge the options from each generator into the `app` options.
 
 
@@ -128,7 +128,7 @@ console.log(app.options);
 ```
 
 
-### [.tasks](lib/composition-handler.js#L134)
+### [.tasks](lib/composition-handler.js#L130)
 Copy the specified tasks from each generator into the `app` tasks. Task dependencies will also be copied.
 
 
@@ -145,7 +145,7 @@ app.compose(['a', 'b', 'c'])
 ```
 
 
-### [.views](lib/composition-handler.js#L157)
+### [.views](lib/composition-handler.js#L152)
 Copy the view collections and loaded views from each generator to the `app`.
 
 
@@ -162,7 +162,7 @@ app.compose(['a', 'b', 'c'])
 ```
 
 
-### [.iterator](lib/composition-handler.js#L198)
+### [.iterator](lib/composition-handler.js#L192)
 Iterates over the specified generators and only calls `fn` on existing generators. Function passed into the iterator will be invoked with the current generator being iterated over (`gen`) and the app passed into the original function. No binding is done within the iterator so the function passed in can be safely bound.
 
 
