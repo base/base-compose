@@ -17,7 +17,8 @@ module.exports = function (options) {
   return function(app) {
 
     /**
-     * Setup a composition by passing in an array of generators to compose elements from.
+     * Setup a composition by passing in an array of generators to compose elements.
+     * If a generator cannot be found, an error will be thrown.
      *
      * ```js
      * var composition = app.compose(['a', 'b', 'c']);
