@@ -1,4 +1,4 @@
-# base-compose [![NPM version](https://img.shields.io/npm/v/base-compose.svg)](https://www.npmjs.com/package/base-compose) [![Build Status](https://img.shields.io/travis/base/base-compose.svg)](https://travis-ci.org/base/base-compose)
+# base-compose [![NPM version](https://img.shields.io/npm/v/base-compose.svg)](https://www.npmjs.com/package/base-compose) [![Build Status](https://img.shields.io/travis/node-base/base-compose.svg)](https://travis-ci.org/node-base/base-compose)
 
 > Compose elements from multiple applications into one.
 

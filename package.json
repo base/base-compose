@@ -2,11 +2,11 @@
   "name": "base-compose",
   "description": "Compose elements from multiple applications into one.",
   "version": "0.1.0",
-  "homepage": "https://github.com/base/base-compose",
+  "homepage": "https://github.com/node-base/base-compose",
   "author": "Brian Woodward (https://github.com/doowb)",
-  "repository": "base/base-compose",
+  "repository": "node-base/base-compose",
   "bugs": {
-    "url": "https://github.com/base/base-compose/issues"
+    "url": "https://github.com/node-base/base-compose/issues"
   },
   "license": "MIT",
   "files": [
