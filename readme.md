@@ -70,7 +70,7 @@ console.log(app.cache.data);
 ```
 
 
-### [.engines](lib/composition-handler.js#L65)
+### [.engines](lib/composition-handler.js#L68)
 Merge the engines from each generator into the `app` engines.
 
 
@@ -87,7 +87,7 @@ app.compose(['a', 'b', 'c'])
 ```
 
 
-### [.helpers](lib/composition-handler.js#L85)
+### [.helpers](lib/composition-handler.js#L91)
 Merge the helpers from each generator into the `app` helpers.
 
 
@@ -104,7 +104,7 @@ app.compose(['a', 'b', 'c'])
 ```
 
 
-### [.options](lib/composition-handler.js#L112)
+### [.options](lib/composition-handler.js#L121)
 Merge the options from each generator into the `app` options.
 
 
@@ -128,7 +128,7 @@ console.log(app.options);
 ```
 
 
-### [.tasks](lib/composition-handler.js#L138)
+### [.tasks](lib/composition-handler.js#L150)
 Copy the specified tasks from each generator into the `app` tasks. Task dependencies will also be copied.
 
 
@@ -145,7 +145,7 @@ app.compose(['a', 'b', 'c'])
 ```
 
 
-### [.views](lib/composition-handler.js#L160)
+### [.views](lib/composition-handler.js#L175)
 Copy the view collections and loaded views from each generator to the `app`.
 
 
@@ -162,7 +162,7 @@ app.compose(['a', 'b', 'c'])
 ```
 
 
-### [.iterator](lib/composition-handler.js#L200)
+### [.iterator](lib/composition-handler.js#L218)
 Iterates over the specified generators and only calls `fn` on existing generators. Function passed into the iterator will be invoked with the current generator being iterated over (`gen`) and the app passed into the original function. No binding is done within the iterator so the function passed in can be safely bound.
 
 
