@@ -12,9 +12,9 @@ $ npm i base-compose --save
 
 ## Usage
 
-This plugin requires an "app" using the [base-generators](https://github.com/jonschlinkert/base-generators)to be able to lookup generators to compose.
+This plugin requires an "app" using the [base-generators](https://github.com/jonschlinkert/base-generators) to be able to lookup generators to compose.
 Some of the [composition handler](#composition-handler-api) methods require an "app" that is inherited from
-[templates](https://github.com/jonschlinkert/templates)or use specific plugins. The methods and plugins are specified in the [api](#api) section.
+[templates](https://github.com/jonschlinkert/templates) or use specific plugins. The methods and plugins are specified in the [api](#api) section.
 
 ```js
 var compose = require('base-compose');
@@ -97,7 +97,7 @@ app.compose(['a', 'b', 'c'])
 
 ### [.options](lib/composition-handler.js#L124)
 
-Merge the options from each generator into the `app` options. This method requires using the [base-option](https://github.com/node-base/base-option)plugin.
+Merge the options from each generator into the `app` options. This method requires using the [base-option](https://github.com/node-base/base-option) plugin.
 
 **Params**
 
@@ -120,7 +120,7 @@ console.log(app.options);
 
 ### [.tasks](lib/composition-handler.js#L153)
 
-Copy the specified tasks from each generator into the `app` tasks. Task dependencies will also be copied. This method requires using the [base-task](https://github.com/node-base/base-task)plugin.
+Copy the specified tasks from each generator into the `app` tasks. Task dependencies will also be copied. This method requires using the [base-task](https://github.com/node-base/base-task) plugin.
 
 + `returns` **{Object}**: Returns `this` for chaining
 
