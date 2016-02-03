@@ -42,15 +42,15 @@
   "verb": {
     "related": {
       "list": [
-        "base",
-        "base-tasks",
-        "base-generators",
-        "base-options",
         "assemble-core",
+        "assemble",
+        "base",
+        "base-generators",
+        "base-option",
+        "base-task",
         "generate",
         "update",
-        "verb",
-        "assemble"
+        "verb"
       ]
     }
   }
