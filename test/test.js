@@ -1,18 +1,21 @@
 'use strict';
 
 require('mocha');
+var Base = require('base');
 var assert = require('assert');
-var Base = require('assemble-core');
+var task = require('base-task');
+var option = require('base-option');
+var Assemble = require('assemble-core');
 var generators = require('base-generators');
-Base.use(generators());
+Assemble.use(generators());
 
-var plugin = require('../');
+var compose = require('../');
 var app;
 
 describe('base-compose', function() {
   beforeEach(function() {
-    app = new Base();
-    app.use(plugin());
+    app = new Assemble();
+    app.use(compose());
   });
 
   it('should add `.compose` method to `app`', function() {
@@ -55,6 +58,21 @@ describe('base-compose', function() {
         .data('a.b.c');
 
       assert.deepEqual(app.cache.data, {a: {b: {c: {d: 'e'}}}});
+    });
+
+    it('should throw an error when the `data` api is not present', function(cb) {
+      app = new Base();
+      app.use(generators());
+      app.use(compose());
+      app.register('a', function() {});
+      try {
+        app.compose(['a']).data();
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert(err);
+        assert.equal(err.message, '.data expects a ".data()" method on "app"');
+        cb();
+      }
     });
   });
 
