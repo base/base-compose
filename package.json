@@ -33,6 +33,7 @@
     "engine-handlebars": "^0.8.0",
     "gulp": "^3.9.0",
     "gulp-eslint": "^1.1.1",
+    "gulp-format-md": "^0.1.5",
     "gulp-istanbul": "^0.10.3",
     "gulp-mocha": "^2.2.0",
     "mocha": "*",
@@ -49,9 +50,13 @@
         "base-option",
         "base-task",
         "generate",
+        "templates",
         "update",
         "verb"
       ]
-    }
+    },
+    "plugins": [
+      "gulp-format-md"
+    ]
   }
 }
