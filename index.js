@@ -37,6 +37,9 @@ module.exports = function (options) {
      */
 
     this.define('compose', function(arr) {
+      if (typeof this.getGenerator !== 'function') {
+        throw new Error('.compose expects an "app" using the "base-generators" plugin');
+      }
       return new CompositionHandler(this, arr);
     });
   };
