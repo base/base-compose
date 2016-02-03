@@ -30,6 +30,10 @@
     "base-generators": "^0.1.2",
     "engine-base": "^0.1.2",
     "engine-handlebars": "^0.8.0",
+    "gulp": "^3.9.0",
+    "gulp-eslint": "^1.1.1",
+    "gulp-istanbul": "^0.10.3",
+    "gulp-mocha": "^2.2.0",
     "mocha": "*",
     "should": "*"
   },
