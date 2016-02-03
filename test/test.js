@@ -1,10 +1,8 @@
 'use strict';
 
 require('mocha');
-var Base = require('base');
+var Base = require('base').namespace('test');
 var assert = require('assert');
-var task = require('base-task');
-var option = require('base-option');
 var Assemble = require('assemble-core');
 var generators = require('base-generators');
 Assemble.use(generators());
@@ -24,6 +22,23 @@ describe('base-compose', function() {
 
   it('should not have any generators if none are passed', function() {
     assert.deepEqual(app.compose().generators, []);
+  });
+
+  it('should throw an error when an app not using "base-generators" is used', function(cb) {
+    function App () {
+      Base.call(this);
+    }
+    Base.extend(App);
+    app = new App();
+    app.use(compose());
+    try {
+      app.compose();
+      cb(new Error('expected an error'));
+    } catch (err) {
+      assert(err);
+      assert.equal(err.message, '.compose expects an "app" using the "base-generators" plugin');
+      cb();
+    }
   });
 
   describe('data', function() {
@@ -88,6 +103,21 @@ describe('base-compose', function() {
 
       assert.deepEqual(app._.engines, a._.engines);
     });
+
+    it('should throw an error when the `engine` api is not present', function(cb) {
+      app = new Base();
+      app.use(generators());
+      app.use(compose());
+      app.register('a', function() {});
+      try {
+        app.compose(['a']).engines();
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert(err);
+        assert.equal(err.message, '.engines expects an ".engine()" method on "app"');
+        cb();
+      }
+    });
   });
 
   describe('helpers', function() {
@@ -106,6 +136,21 @@ describe('base-compose', function() {
         .helpers();
 
       assert.deepEqual(app._.helpers, a._.helpers);
+    });
+
+    it('should throw an error when the `helper` api is not present', function(cb) {
+      app = new Base();
+      app.use(generators());
+      app.use(compose());
+      app.register('a', function() {});
+      try {
+        app.compose(['a']).helpers();
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert(err);
+        assert.equal(err.message, '.helpers expects a ".helper()" method on "app"');
+        cb();
+      }
     });
   });
 
@@ -141,6 +186,21 @@ describe('base-compose', function() {
         .options('a.b.c');
 
       assert.deepEqual(app.options, {a: {b: {c: {d: 'e'}}}});
+    });
+
+    it('should throw an error when the `option` api is not present', function(cb) {
+      app = new Base();
+      app.use(generators());
+      app.use(compose());
+      app.register('a', function() {});
+      try {
+        app.compose(['a']).options();
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert(err);
+        assert.equal(err.message, '.options expects an ".option()" method from "base-option" on "app"');
+        cb();
+      }
     });
   });
 
@@ -218,6 +278,23 @@ describe('base-compose', function() {
         cb();
       }
     });
+
+    it('should throw an error when the `task` api is not present', function(cb) {
+      app = new Base();
+      app.use(generators());
+      app.use(compose());
+      delete app.task;
+
+      app.register('a', function() {});
+      try {
+        app.compose(['a']).tasks();
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert(err);
+        assert.equal(err.message, '.tasks expects a ".task()" method from "base-task" on "app"');
+        cb();
+      }
+    });
   });
 
   describe('views', function() {
@@ -252,6 +329,21 @@ describe('base-compose', function() {
       assert.equal(typeof app.views.templates, 'object');
       assert.equal(typeof app.views.templates.foo, 'object');
       assert.equal(typeof app.views.templates.bar, 'object');
+    });
+
+    it('should throw an error when the `views` api is not present', function(cb) {
+      app = new Base();
+      app.use(generators());
+      app.use(compose());
+      app.register('a', function() {});
+      try {
+        app.compose(['a']).views();
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert(err);
+        assert.equal(err.message, '.views expects the "app" to be inherited from "templates"');
+        cb();
+      }
     });
   });
 
