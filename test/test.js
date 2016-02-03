@@ -34,6 +34,28 @@ describe('base-compose', function() {
 
       assert.deepEqual(app.cache.data, a.cache.data);
     });
+
+    it('should copy data from `a` to `app` specified by property path', function() {
+      var a = app.register('a', function(a) {
+        a.data({
+          a: {
+            b: {
+              c: {d: 'e'},
+              c1: {d: 'e'}
+            },
+            b1: {
+              c1: {d: 'e'}
+            }
+          },
+          a1: {b: {c: {d: 'e'}}}
+        });
+      });
+
+      app.compose(['a'])
+        .data('a.b.c');
+
+      assert.deepEqual(app.cache.data, {a: {b: {c: {d: 'e'}}}});
+    });
   });
 
   describe('engines', function() {
@@ -79,6 +101,28 @@ describe('base-compose', function() {
         .options();
 
       assert.deepEqual(app.options, a.options);
+    });
+
+    it('should copy options from `a` to `app` specified by property path', function() {
+      var a = app.register('a', function(a) {
+        a.option({
+          a: {
+            b: {
+              c: {d: 'e'},
+              c1: {d: 'e'}
+            },
+            b1: {
+              c1: {d: 'e'}
+            }
+          },
+          a1: {b: {c: {d: 'e'}}}
+        });
+      });
+
+      app.compose(['a'])
+        .options('a.b.c');
+
+      assert.deepEqual(app.options, {a: {b: {c: {d: 'e'}}}});
     });
   });
 
