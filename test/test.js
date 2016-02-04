@@ -331,6 +331,80 @@ describe('base-compose', function() {
       assert.equal(typeof app.views.templates.bar, 'object');
     });
 
+    it('should only copy specified collections from `a` to `app`', function() {
+      var a = app.register('a', function(a) {
+        a.create('templates');
+        a.template('foo.hbs', {content: 'foo'});
+
+        a.create('files');
+        a.file('foo.md', {content: 'foo'});
+      });
+
+      app.compose(['a'])
+        .views(['files']);
+
+      assert.equal(typeof app.template, 'undefined');
+      assert.equal(typeof app.templates, 'undefined');
+      assert.equal(typeof app.file, 'function');
+      assert.equal(typeof app.files, 'function');
+      assert.equal(typeof app.views.templates, 'undefined');
+      assert.equal(typeof app.views.files, 'object');
+      assert.equal(typeof app.views.files['foo.md'], 'object');
+    });
+
+    it('should only copy filtered views from specified collections from `a` to `app`', function() {
+      var a = app.register('a', function(a) {
+        a.create('templates');
+        a.template('foo.hbs', {content: 'foo'});
+
+        a.create('files');
+        a.file('foo.md', {content: 'foo'});
+        a.file('bar.md', {content: 'bar'});
+      });
+
+      app.compose(['a'])
+        .views(['files'], function(key, view) {
+          return key.indexOf('foo') !== -1;
+        });
+
+      assert.equal(typeof app.template, 'undefined');
+      assert.equal(typeof app.templates, 'undefined');
+      assert.equal(typeof app.file, 'function');
+      assert.equal(typeof app.files, 'function');
+      assert.equal(typeof app.views.templates, 'undefined');
+      assert.equal(typeof app.views.files, 'object');
+      assert.equal(typeof app.views.files['foo.md'], 'object');
+      assert.equal(typeof app.views.files['bar.md'], 'undefined');
+    });
+
+    it('should only copy filtered views from all collections from `a` to `app`', function() {
+      var a = app.register('a', function(a) {
+        a.create('templates');
+        a.template('foo.hbs', {content: 'foo'});
+        a.template('bar.hbs', {content: 'bar'});
+
+        a.create('files');
+        a.file('foo.md', {content: 'foo'});
+        a.file('bar.md', {content: 'bar'});
+      });
+
+      app.compose(['a'])
+        .views(function(key, view) {
+          return key.indexOf('foo') !== -1;
+        });
+
+      assert.equal(typeof app.template, 'function');
+      assert.equal(typeof app.templates, 'function');
+      assert.equal(typeof app.file, 'function');
+      assert.equal(typeof app.files, 'function');
+      assert.equal(typeof app.views.templates, 'object');
+      assert.equal(typeof app.views.templates['foo.hbs'], 'object');
+      assert.equal(typeof app.views.templates['bar.hbs'], 'undefined');
+      assert.equal(typeof app.views.files, 'object');
+      assert.equal(typeof app.views.files['foo.md'], 'object');
+      assert.equal(typeof app.views.files['bar.md'], 'undefined');
+    });
+
     it('should throw an error when the `views` api is not present', function(cb) {
       app = new Base();
       app.use(generators());
