@@ -131,10 +131,14 @@ app.compose(['a', 'b', 'c'])
   .tasks(['foo', 'bar', 'default']);
 ```
 
-### [.views](lib/composition-handler.js#L178)
+### [.views](lib/composition-handler.js#L180)
 
 Copy the view collections and loaded views from each generator to the `app`. This method requires using an "app" inherited from [templates](https://github.com/jonschlinkert/templates).
 
+**Params**
+
+* `names` **{Array}**: Optionally pass an array of collection names that will be copied. When names are not sepcified, all collections are copied.
+* `filter` **{Function}**: Optionally pass a filter function that will receive the `key, view, collection` for each view being copied. Returning `false` will not copy the view.
 * `returns` **{Object}**: Returns `this` for chaining
 
 **Example**
@@ -144,7 +148,7 @@ app.compose(['a', 'b', 'c'])
   .views();
 ```
 
-### [.iterator](lib/composition-handler.js#L245)
+### [.iterator](lib/composition-handler.js#L247)
 
 Iterates over the specified generators and only calls `fn` on existing generators. Function passed into the iterator will be invoked with the current generator being iterated over (`gen`) and the app passed into the original function. No binding is done within the iterator so the function passed in can be safely bound.
 
