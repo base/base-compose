@@ -13,7 +13,7 @@ var CompositionHandler = require('./lib/composition-handler');
  * Expose `compose`
  */
 
-module.exports = function (options) {
+module.exports = function(options) {
   return function(app) {
 
     /**

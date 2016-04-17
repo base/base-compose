@@ -11,7 +11,7 @@
   "license": "MIT",
   "files": [
     "index.js",
-    "lib/"
+    "lib"
   ],
   "main": "index.js",
   "engines": {
@@ -39,12 +39,15 @@
     "mocha": "*",
     "should": "*"
   },
-  "keywords": [],
+  "keywords": [
+    "base",
+    "compose"
+  ],
   "verb": {
     "related": {
       "list": [
-        "assemble-core",
         "assemble",
+        "assemble-core",
         "base",
         "base-generators",
         "base-option",
