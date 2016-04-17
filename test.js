@@ -1,18 +1,17 @@
 'use strict';
 
 require('mocha');
-var Base = require('base').namespace('test');
 var assert = require('assert');
-var Assemble = require('assemble-core');
+var Base = require('base').namespace('test');
+var assemble = require('assemble-core');
 var generators = require('base-generators');
-Assemble.use(generators());
-
-var compose = require('../');
+var compose = require('./');
 var app;
 
 describe('base-compose', function() {
   beforeEach(function() {
-    app = new Assemble();
+    app = assemble();
+    app.use(generators());
     app.use(compose());
   });
 
@@ -24,19 +23,14 @@ describe('base-compose', function() {
     assert.deepEqual(app.compose().generators, []);
   });
 
-  it('should throw an error when an app not using "base-generators" is used', function(cb) {
-    function App () {
-      Base.call(this);
-    }
-    Base.extend(App);
-    app = new App();
-    app.use(compose());
+  it('should throw an error when "base-generators" is not registered', function(cb) {
     try {
+      app = new Base();
+      app.use(compose());
       app.compose();
       cb(new Error('expected an error'));
     } catch (err) {
-      assert(err);
-      assert.equal(err.message, '.compose expects an "app" using the "base-generators" plugin');
+      assert.equal(err.message, 'expected the base-generators plugin to be registered');
       cb();
     }
   });
@@ -53,18 +47,10 @@ describe('base-compose', function() {
       assert.deepEqual(app.cache.data, a.cache.data);
     });
 
-    it('should copy data from `a` to `app` specified by property path', function() {
-      var a = app.register('a', function(a) {
+    it.only('should copy data from `a` to `app` specified by property path', function() {
+      app.register('a', function(a) {
         a.data({
-          a: {
-            b: {
-              c: {d: 'e'},
-              c1: {d: 'e'}
-            },
-            b1: {
-              c1: {d: 'e'}
-            }
-          },
+          a: {b: {c: {d: 'e'}, c1: {d: 'e'}}, b1: {c1: {d: 'e'}}},
           a1: {b: {c: {d: 'e'}}}
         });
       });
