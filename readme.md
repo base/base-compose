@@ -1,203 +1,114 @@
-# base-compose [![NPM version](https://img.shields.io/npm/v/base-compose.svg)](https://www.npmjs.com/package/base-compose) [![Build Status](https://img.shields.io/travis/node-base/base-compose.svg)](https://travis-ci.org/node-base/base-compose)
+# base-compose [![NPM version](https://img.shields.io/npm/v/base-compose.svg?style=flat)](https://www.npmjs.com/package/base-compose) [![NPM downloads](https://img.shields.io/npm/dm/base-compose.svg?style=flat)](https://npmjs.org/package/base-compose) [![Build Status](https://img.shields.io/travis/node-base/base-compose.svg?style=flat)](https://travis-ci.org/node-base/base-compose)
 
-> Compose elements from multiple applications into one.
+> Selectively merge values from one or more generators onto the current application instance.
 
 ## Install
 
 Install with [npm](https://www.npmjs.com/):
 
 ```sh
-$ npm i base-compose --save
+$ npm install base-compose --save
 ```
+
+This plugin requires the [base-generators](https://github.com/node-base/base-generators) to be registered first. If not already registered, you can do so now by following [these instructions](#base-generators).
 
 ## Usage
 
-This plugin requires an "app" using the [base-generators](https://github.com/jonschlinkert/base-generators) to be able to lookup generators to compose.
-Some of the [composition handler](#composition-handler-api) methods require an "app" that is inherited from
-[templates](https://github.com/jonschlinkert/templates) or use specific plugins. The methods and plugins are specified in the [api](#api) section.
-
 ```js
 var compose = require('base-compose');
+var Base = require('base');
+var app = new Base();
+
+// register the "compose" plugin
 app.use(compose());
 ```
 
 ## API
 
-### [.compose](index.js#L39)
+**Heads up!**
+
+Some of the methods exposed on [.compose](#methods) expect for `app` to be an instance of [templates](https://github.com/jonschlinkert/templates), or for specific plugins to be registered first.
+
+You don't need to register all of the plugins prescribed below, just use the plugins you need with the methods you need. `base-compose` will give you detailed error messages when something is missing.
+
+More information is provided in the [methods documentation](#methods) below.
+
+### [.compose](index.js#L38)
 
 Setup a composition by passing in an array of generators to compose elements. If a generator cannot be found, an error will be thrown.
 
 **Params**
 
-* `generators` **{Array}**: Array of generators to be composed.
-* `returns` **{Object}**: Instance of [CompositionHandler](#composition-handler-api)
+* `names` **{String|Array}**: One or more generator names.
+* `returns` **{Object}**: Returns an instance of `Compose`
 
 **Example**
 
 ```js
-var composition = app.compose(['a', 'b', 'c']);
-
-// most of the time, use chaining
 app.compose(['a', 'b', 'c'])
   .data()
   .options()
+  .helpers()
   .views();
 ```
 
-### Composition Handler API
+## base-generators
 
-### [.data](lib/composition-handler.js#L40)
+Follow these instructions to install and register the [base-generators](https://github.com/node-base/base-generators) plugin before registering `base-compose`.
 
-Merge the `cache.data` object from each generator onto the `app.cache.data` object. This method requires the `.data()` method from [templates](https://github.com/jonschlinkert/templates).
+**Install base-generators**
 
-**Params**
-
-* `key` **{String}**: Optionally pass a key to merge from the `data` object.
-* `returns` **{Object}**: Returns `this` for chaining
-
-**Example**
-
-```js
-a.data({foo: 'a'});
-b.data({foo: 'b'});
-c.data({foo: 'c'});
-
-app.compose(['a', 'b', 'c'])
-  .data();
-
-console.log(app.cache.data);
-//=> {foo: 'c'}
+```sh
+$ npm install base-generators --save
 ```
 
-### [.engines](lib/composition-handler.js#L69)
-
-Merge the engines from each generator into the `app` engines. This method requires the `.engine()` methods from [templates](https://github.com/jonschlinkert/templates).
-
-* `returns` **{Object}**: Returns `this` for chaining
-
-**Example**
+**Register base-generators**
 
 ```js
-app.compose(['a', 'b', 'c'])
-  .engines();
-```
+var generators = require('base-generators');
+var compose = require('base-compose');
+var Base = require('base');
+var app = new Base();
 
-### [.helpers](lib/composition-handler.js#L93)
-
-Merge the helpers from each generator into the `app` helpers. This method requires the `.helper` method from [templates](https://github.com/jonschlinkert/templates).
-
-* `returns` **{Object}**: Returns `this` for chaining
-
-**Example**
-
-```js
-app.compose(['a', 'b', 'c'])
-  .helpers();
-```
-
-### [.options](lib/composition-handler.js#L124)
-
-Merge the options from each generator into the `app` options. This method requires using the [base-option](https://github.com/node-base/base-option) plugin.
-
-**Params**
-
-* `key` **{String}**: Optionally pass a key to merge from the `options` object.
-* `returns` **{Object}**: Returns `this` for chaining
-
-**Example**
-
-```js
-a.option({foo: 'a'});
-b.option({foo: 'b'});
-c.option({foo: 'c'});
-
-app.compose(['a', 'b', 'c'])
-  .options();
-
-console.log(app.options);
-//=> {foo: 'c'}
-```
-
-### [.tasks](lib/composition-handler.js#L153)
-
-Copy the specified tasks from each generator into the `app` tasks. Task dependencies will also be copied. This method requires using the [base-task](https://github.com/node-base/base-task) plugin.
-
-+ `returns` **{Object}**: Returns `this` for chaining
-
-**Example**
-
-```js
-app.compose(['a', 'b', 'c'])
-  .tasks(['foo', 'bar', 'default']);
-```
-
-### [.views](lib/composition-handler.js#L180)
-
-Copy the view collections and loaded views from each generator to the `app`. This method requires using an "app" inherited from [templates](https://github.com/jonschlinkert/templates).
-
-**Params**
-
-* `names` **{Array}**: Optionally pass an array of collection names that will be copied. When names are not sepcified, all collections are copied.
-* `filter` **{Function}**: Optionally pass a filter function that will receive the `key, view, collection` for each view being copied. Returning `false` will not copy the view.
-* `returns` **{Object}**: Returns `this` for chaining
-
-**Example**
-
-```js
-app.compose(['a', 'b', 'c'])
-  .views();
-```
-
-### [.iterator](lib/composition-handler.js#L247)
-
-Iterates over the specified generators and only calls `fn` on existing generators. Function passed into the iterator will be invoked with the current generator being iterated over (`gen`) and the app passed into the original function. No binding is done within the iterator so the function passed in can be safely bound.
-
-**Params**
-
-* `generators` **{Array}**: Optional array of generator names to be looked up and iterated over.
-* `fn` **{Function}**: Function invoked with generator currently being iterated over and the app.
-* `returns` **{Object}**: Returns `this` for chaining
-
-**Example**
-
-```js
-app.compose(['a', 'b', 'c'])
-  .iterator(function(gen, app) {
-    // do work
-    app.data(gen.cache.data);
-  });
-
-// optionally, a different array of generator names may be passed as the first argument.
-app.compose(['a', 'b', 'c'])
-  .iterator(['d', 'e', 'f'], function(gen, app) {
-    // do work
-  });
+// register plugins
+app.use(generators());
+app.use(compose());
 ```
 
 ## Related projects
 
+You might also be interested in these projects:
+
 * [assemble](https://www.npmjs.com/package/assemble): Assemble is a powerful, extendable and easy to use static site generator for node.js. Used… [more](https://www.npmjs.com/package/assemble) | [homepage](https://github.com/assemble/assemble)
-* [assemble-core](https://www.npmjs.com/package/assemble-core): The core assemble application with no presets or defaults. All configuration is left to the… [more](https://www.npmjs.com/package/assemble-core) | [homepage](https://github.com/assemble/assemble-core)
 * [base](https://www.npmjs.com/package/base): base is the foundation for creating modular, unit testable and highly pluggable node.js applications, starting… [more](https://www.npmjs.com/package/base) | [homepage](https://github.com/node-base/base)
-+ [base-generators](https://www.npmjs.com/package/base-generators): Adds project-generator support to your `base` application. | [homepage](https://github.com/jonschlinkert/base-generators)
-+ [base-option](https://www.npmjs.com/package/base-option): Adds a few options methods to base, like `option`, `enable` and `disable`. See the readme… [more](https://www.npmjs.com/package/base-option) | [homepage](https://github.com/node-base/base-option)
-+ [base-task](https://www.npmjs.com/package/base-task): base plugin that provides a very thin wrapper around [https://github.com/doowb/composer](https://github.com/doowb/composer) for adding task methods to… [more](https://www.npmjs.com/package/base-task) | [homepage](https://github.com/node-base/base-task)
-+ [generate](https://www.npmjs.com/package/generate): Fast, composable, highly extendable project generator with a user-friendly and expressive API. | [homepage](https://github.com/generate/generate)
-* [templates](https://www.npmjs.com/package/templates): System for creating and managing template collections, and rendering templates with any node.js template engine.… [more](https://www.npmjs.com/package/templates) | [homepage](https://github.com/jonschlinkert/templates)
-* [update](https://www.npmjs.com/package/update): Easily keep anything in your project up-to-date by installing the updaters you want to use… [more](https://www.npmjs.com/package/update) | [homepage](https://github.com/update/update)
+* [generate](https://www.npmjs.com/package/generate): Fast, composable, highly extendable project generator with a user-friendly and expressive API. | [homepage](https://github.com/generate/generate)
 * [verb](https://www.npmjs.com/package/verb): Documentation generator for GitHub projects. Verb is extremely powerful, easy to use, and is used… [more](https://www.npmjs.com/package/verb) | [homepage](https://github.com/verbose/verb)
+
+## Contributing
+
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/doowb/base-compose/issues/new).
+
+## Building docs
+
+Generate readme and API documentation with [verb](https://github.com/verbose/verb):
+
+```sh
+$ npm install verb && npm run docs
+```
+
+Or, if [verb](https://github.com/verbose/verb) is installed globally:
+
+```sh
+$ verb
+```
 
 ## Running tests
 
 Install dev dependencies:
 
 ```sh
-$ npm i -d && npm test
+$ npm install -d && npm test
 ```
-
-## Contributing
-
-Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/doowb/base-compose/issues/new).
 
 ## Author
 
@@ -208,9 +119,9 @@ Pull requests and stars are always welcome. For bugs and feature requests, [plea
 
 ## License
 
-Copyright © 2016 [Brian Woodward](https://github.com/doowb)
-Released under the MIT license.
+Copyright © 2016, [Brian Woodward](https://github.com/doowb).
+Released under the [MIT license](https://github.com/node-base/base-compose/blob/master/LICENSE).
 
 ***
 
-_This file was generated by [verb](https://github.com/verbose/verb) on February 04, 2016._
+_This file was generated by [verb](https://github.com/verbose/verb), v0.9.0, on April 20, 2016._
