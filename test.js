@@ -50,7 +50,7 @@ describe('base-compose', function() {
     });
 
     it('should copy options from `a` to `app` specified by property path', function() {
-      var a = app.register('a', function(a) {
+      app.register('a', function(a) {
         a.option({
           a: {
             b: {
@@ -222,7 +222,7 @@ describe('base-compose', function() {
       var count = 0;
       var output = [];
       app.name = 'app';
-      var a = app.register('a', function(a) {
+      app.register('a', function(a) {
         a.task('default', function(cb) {
           output.push(this.app.name + ': ' + this.name);
           count++;
@@ -245,7 +245,7 @@ describe('base-compose', function() {
       var count = 0;
       var output = [];
       app.name = 'app';
-      var a = app.register('a', function(a) {
+      app.register('a', function(a) {
         a.task('default', function(cb) {
           output.push(this.app.name + ': ' + this.name);
           count++;
@@ -274,7 +274,7 @@ describe('base-compose', function() {
       var count = 0;
       var output = [];
       app.name = 'app';
-      var a = app.register('a', function(a) {
+      app.register('a', function(a) {
         a.task('foo', function(cb) {
           output.push(this.app.name + ': ' + this.name);
           count++;
@@ -300,7 +300,7 @@ describe('base-compose', function() {
     });
 
     it('should throw an error when a task does not exist on `a`.', function(cb) {
-      var a = app.register('a', function(a) {
+      app.register('a', function(a) {
         a.task('foo', function(cb) {
           cb();
         });
@@ -342,7 +342,7 @@ describe('base-compose', function() {
 
   describe('views', function() {
     it('should copy views from `a` to `app`', function() {
-      var a = app.register('a', function(a) {
+      app.register('a', function(a) {
         a.create('templates');
         a.template('foo', {content: 'foo'});
       });
@@ -359,7 +359,7 @@ describe('base-compose', function() {
     it('should only copy collections from `a` to `app` that are not already on `app`', function() {
       app.create('templates');
       app.template('bar', {content: 'bar'});
-      var a = app.register('a', function(a) {
+      app.register('a', function(a) {
         a.create('templates');
         a.template('foo', {content: 'foo'});
       });
@@ -375,7 +375,7 @@ describe('base-compose', function() {
     });
 
     it('should only copy specified collections from `a` to `app`', function() {
-      var a = app.register('a', function(a) {
+      app.register('a', function(a) {
         a.create('templates');
         a.template('foo.hbs', {content: 'foo'});
 
@@ -396,7 +396,7 @@ describe('base-compose', function() {
     });
 
     it('should only copy filtered views from specified collections from `a` to `app`', function() {
-      var a = app.register('a', function(a) {
+      app.register('a', function(a) {
         a.create('templates');
         a.template('foo.hbs', {content: 'foo'});
 
@@ -421,7 +421,7 @@ describe('base-compose', function() {
     });
 
     it('should only copy filtered views from all collections from `a` to `app`', function() {
-      var a = app.register('a', function(a) {
+      app.register('a', function(a) {
         a.create('templates');
         a.template('foo.hbs', {content: 'foo'});
         a.template('bar.hbs', {content: 'bar'});
