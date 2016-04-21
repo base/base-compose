@@ -52,6 +52,156 @@ app.compose(['a', 'b', 'c'])
   .views();
 ```
 
+### [.compose.options](lib/compose.js#L42)
+
+Merge the options from each generator into the `app` options. This method requires using the [base-option][base-option] plugin.
+
+**Params**
+
+* `key` **{String}**: Optionally pass the name of a property to merge from the `options` object. Dot-notation may be used for nested properties.
+* `returns` **{Object}**: Returns the `Compose` instance for chaining
+
+**Example**
+
+```js
+a.option({foo: 'a'});
+b.option({foo: 'b'});
+c.option({foo: 'c'});
+
+app.compose(['a', 'b', 'c'])
+  .options();
+
+console.log(app.options);
+//=> {foo: 'c'}
+```
+
+### [.compose.data](lib/compose.js#L74)
+
+Merge the `cache.data` object from each generator onto the `app.cache.data` object. This method requires the `.data()` method from [templates](https://github.com/jonschlinkert/templates).
+
+**Params**
+
+* `key` **{String}**: Optionally pass a key to merge from the `data` object.
+* `returns` **{Object}**: Returns the `Compose` instance for chaining
+
+**Example**
+
+```js
+a.data({foo: 'a'});
+b.data({foo: 'b'});
+c.data({foo: 'c'});
+
+app.compose(['a', 'b', 'c'])
+  .data();
+
+console.log(app.cache.data);
+//=> {foo: 'c'}
+```
+
+### [.compose.engines](lib/compose.js#L103)
+
+Merge the engines from each generator into the `app` engines. This method requires the `.engine()` methods from [templates](https://github.com/jonschlinkert/templates).
+
+* `returns` **{Object}**: Returns the `Compose` instance for chaining
+
+**Example**
+
+```js
+app.compose(['a', 'b', 'c'])
+  .engines();
+```
+
+### [.compose.helpers](lib/compose.js#L128)
+
+Merge the helpers from each generator into `app.helpers`. Requires the `.helper` method from [templates](https://github.com/jonschlinkert/templates).
+
+* `returns` **{Object}**: Returns the `Compose` instance for chaining
+
+**Example**
+
+```js
+app.compose(['a', 'b', 'c'])
+  .helpers();
+```
+
+### [.compose.pipeline](lib/compose.js#L154)
+
+Merge the pipeline plugins from each generator onto `app.plugins`. Requires the [base-pipeline](https://github.com/node-base/base-pipeline) plugin to be registered.
+
+* `returns` **{Object}**: Returns the `Compose` instance for chaining
+
+**Example**
+
+```js
+app.compose(['a', 'b', 'c'])
+  .pipeline();
+```
+
+### [.compose.tasks](lib/compose.js#L188)
+
+Copy the specified tasks and task-dependencies from each generator onto `app.tasks`. Requires using the [base-task](https://github.com/node-base/base-task) plugin to be registered.
+
+**Params**
+
+* `tasks` **{String|Array}**: One or more task names (optional)
+* `returns` **{Object}**: Returns the `Compose` instance for chaining
+
+**Example**
+
+```js
+app.compose(['a', 'b', 'c'])
+  .tasks(['foo', 'bar', 'default']);
+
+// or to copy all tasks
+app.compose(['a', 'b', 'c'])
+  .tasks();
+```
+
+### [.compose.views](lib/compose.js#L217)
+
+Copy view collections and views from each generator onto `app`. Expects `app` to be an instance of [templates](https://github.com/jonschlinkert/templates).
+
+**Params**
+
+* `names` **{Array|String}**: (optional) Names of one or more collections to copy. If undefined all collections will be copied.
+* `filter` **{Function}**: Optionally pass a filter function to filter views copied from each collection. The filter function exposes `key`, `view` and `collection` as arguments. If used, the function must return `true` to copy a view.
+* `returns` **{Object}**: Returns the `Compose` instance for chaining
+
+**Example**
+
+```js
+app.compose(['a', 'b', 'c'])
+  .views();
+```
+
+### [.compose.iterator](lib/compose.js#L296)
+
+Returns an iterator function for iterating over an array of generators. The iterator takes a `fn` that exposes the current generator being iterated over (`generator`) and the app passed into the original function as arguments. No binding is done within the iterator so the function passed in can be safely bound.
+
+**Params**
+
+* `names` **{Array}**: Names of generators to iterate over (optional).
+* `iteratorFn` **{Function}**: Function to invoke for each generator in `generators`. Exposes `app` and `generator` as arguments.
+* `returns` **{Object}**: Returns the `Compose` instance for chaining
+
+**Example**
+
+```js
+app.compose(['a', 'b', 'c'])
+  .iterator(function(generator, app) {
+    // do work
+    app.data(generator.cache.data);
+  });
+
+// optionally pass an array of additional generator names as the
+// first argument. If generator names are defined on `iterator`,
+// any names passed to `.compose()` will be ignored.
+app.compose(['a', 'b', 'c'])
+  .iterator(['d', 'e', 'f'], function(generator, app) {
+    // do stuff to `generator` and `app`
+  });
+```
+
 ## base-generators
 
 Follow these instructions to install and register the [base-generators](https://github.com/node-base/base-generators) plugin before registering `base-compose`.
