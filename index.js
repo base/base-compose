@@ -7,7 +7,8 @@
 
 'use strict';
 
-var CompositionHandler = require('./lib/composition-handler');
+var Compose = require('./lib/compose');
+var utils = require('./lib/utils');
 
 /**
  * Expose `compose`
@@ -21,26 +22,24 @@ module.exports = function(options) {
      * If a generator cannot be found, an error will be thrown.
      *
      * ```js
-     * var composition = app.compose(['a', 'b', 'c']);
-     *
-     * // most of the time, use chaining
      * app.compose(['a', 'b', 'c'])
      *   .data()
      *   .options()
+     *   .helpers()
      *   .views();
      * ```
      *
      * @name .compose
-     * @param {Array} `generators` Array of generators to be composed.
-     * @return {Object} Instance of [CompositionHandler](#composition-handler-api)
+     * @param {String|Array} `names` One or more generator names.
+     * @return {Object} Returns an instance of `Compose`
      * @api public
      */
 
-    this.define('compose', function(arr) {
-      if (typeof this.getGenerator !== 'function') {
-        throw new Error('.compose expects an "app" using the "base-generators" plugin');
+    this.define('compose', function(names) {
+      if (!this.isGenerator) {
+        throw new Error('expected the base-generators plugin to be registered');
       }
-      return new CompositionHandler(this, arr);
+      return new Compose(this, utils.arrayify(names));
     });
   };
 };

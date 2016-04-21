@@ -4,6 +4,7 @@ require('mocha');
 var assert = require('assert');
 var Base = require('base').namespace('test');
 var assemble = require('assemble-core');
+var pipeline = require('base-pipeline');
 var generators = require('base-generators');
 var compose = require('./');
 var app;
@@ -26,6 +27,7 @@ describe('base-compose', function() {
   it('should throw an error when "base-generators" is not registered', function(cb) {
     try {
       app = new Base();
+      app.isApp = true;
       app.use(compose());
       app.compose();
       cb(new Error('expected an error'));
@@ -33,111 +35,6 @@ describe('base-compose', function() {
       assert.equal(err.message, 'expected the base-generators plugin to be registered');
       cb();
     }
-  });
-
-  describe('data', function() {
-    it('should copy data from `a` to `app`', function() {
-      var a = app.register('a', function(a) {
-        a.data('foo', 'aaa');
-      });
-
-      app.compose(['a'])
-        .data();
-
-      assert.deepEqual(app.cache.data, a.cache.data);
-    });
-
-    it.only('should copy data from `a` to `app` specified by property path', function() {
-      app.register('a', function(a) {
-        a.data({
-          a: {b: {c: {d: 'e'}, c1: {d: 'e'}}, b1: {c1: {d: 'e'}}},
-          a1: {b: {c: {d: 'e'}}}
-        });
-      });
-
-      app.compose(['a'])
-        .data('a.b.c');
-
-      assert.deepEqual(app.cache.data, {a: {b: {c: {d: 'e'}}}});
-    });
-
-    it('should throw an error when the `data` api is not present', function(cb) {
-      app = new Base();
-      app.use(generators());
-      app.use(compose());
-      app.register('a', function() {});
-      try {
-        app.compose(['a']).data();
-        cb(new Error('expected an error'));
-      } catch (err) {
-        assert(err);
-        assert.equal(err.message, '.data expects a ".data()" method on "app"');
-        cb();
-      }
-    });
-  });
-
-  describe('engines', function() {
-    it('should copy engines from `a` to `app`', function() {
-      var a = app.register('a', function(a) {
-        a.engine('hbs', require('engine-handlebars'));
-        a.engine('tmpl', require('engine-base'));
-      });
-
-      app.compose(['a'])
-        .engines();
-
-      assert.deepEqual(app._.engines, a._.engines);
-    });
-
-    it('should throw an error when the `engine` api is not present', function(cb) {
-      app = new Base();
-      app.use(generators());
-      app.use(compose());
-      app.register('a', function() {});
-      try {
-        app.compose(['a']).engines();
-        cb(new Error('expected an error'));
-      } catch (err) {
-        assert(err);
-        assert.equal(err.message, '.engines expects an ".engine()" method on "app"');
-        cb();
-      }
-    });
-  });
-
-  describe('helpers', function() {
-    it('should copy helpers from `a` to `app`', function() {
-      var a = app.register('a', function(a) {
-        a.helper('foo', function(str) {
-          return str + ' FOO';
-        });
-
-        a.asyncHelper('bar', function(str, next) {
-          next(null, str + ' BAR');
-        });
-      });
-
-      app.compose(['a'])
-        .helpers();
-
-      assert.deepEqual(app._.helpers, a._.helpers);
-    });
-
-    it('should throw an error when the `helper` api is not present', function(cb) {
-      app = new Base();
-      app.use(generators());
-      app.use(compose());
-      app.register('a', function() {});
-      try {
-        app.compose(['a']).helpers();
-        cb(new Error('expected an error'));
-      } catch (err) {
-        assert(err);
-        assert.equal(err.message, '.helpers expects a ".helper()" method on "app"');
-        cb();
-      }
-    });
   });
 
   describe('options', function() {
@@ -173,18 +70,148 @@ describe('base-compose', function() {
 
       assert.deepEqual(app.options, {a: {b: {c: {d: 'e'}}}});
     });
+  });
 
-    it('should throw an error when the `option` api is not present', function(cb) {
+  describe('data', function() {
+    it('should copy data from `a` to `app`', function() {
+      var a = app.register('a', function(a) {
+        a.data('foo', 'aaa');
+      });
+
+      app.compose(['a'])
+        .data();
+
+      assert.deepEqual(app.cache.data, a.cache.data);
+    });
+
+    it('should copy data from `a` to `app` specified by property path', function() {
+      app.register('a', function(a) {
+        a.data({
+          a: {b: {c: {d: 'e'}, c1: {d: 'e'}}, b1: {c1: {d: 'e'}}},
+          a1: {b: {c: {d: 'e'}}}
+        });
+      });
+
+      app.compose(['a'])
+        .data('a.b.c');
+
+      assert.deepEqual(app.cache.data, {a: {b: {c: {d: 'e'}}}});
+    });
+
+    it('should throw an error when the `data` api is not present', function(cb) {
       app = new Base();
+      app.isApp = true;
       app.use(generators());
       app.use(compose());
       app.register('a', function() {});
       try {
-        app.compose(['a']).options();
+        app.compose(['a']).data();
         cb(new Error('expected an error'));
       } catch (err) {
         assert(err);
-        assert.equal(err.message, '.options expects an ".option()" method from "base-option" on "app"');
+        assert.equal(err.message, 'expected the base-data plugin to be registered');
+        cb();
+      }
+    });
+  });
+
+  describe('engines', function() {
+    it('should copy engines from `a` to `app`', function() {
+      var a = app.register('a', function(a) {
+        a.engine('hbs', require('engine-handlebars'));
+        a.engine('tmpl', require('engine-base'));
+      });
+
+      app.compose(['a'])
+        .engines();
+
+      assert.deepEqual(app._.engines, a._.engines);
+    });
+
+    it('should throw an error when the `engine` api is not present', function(cb) {
+      app = new Base();
+      app.isApp = true;
+      app.use(generators());
+      app.use(compose());
+      app.register('a', function() {});
+      try {
+        app.compose(['a']).engines();
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert(err);
+        assert.equal(err.message, '.engines requires an instance of templates');
+        cb();
+      }
+    });
+  });
+
+  describe('helpers', function() {
+    it('should copy helpers from `a` to `app`', function() {
+      var a = app.register('a', function(a) {
+        a.helper('foo', function(str) {
+          return str + ' FOO';
+        });
+
+        a.asyncHelper('bar', function(str, next) {
+          next(null, str + ' BAR');
+        });
+      });
+
+      app.compose(['a'])
+        .helpers();
+
+      assert.deepEqual(app._.helpers, a._.helpers);
+    });
+
+    it('should throw an error when the `helper` api is not present', function(cb) {
+      app = new Base();
+      app.isApp = true;
+      app.use(generators());
+      app.use(compose());
+      app.register('a', function() {});
+      try {
+        app.compose(['a']).helpers();
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert(err);
+        assert.equal(err.message, '.helpers requires an instance of templates');
+        cb();
+      }
+    });
+  });
+
+  describe('pipeline plugins', function() {
+    beforeEach(function() {
+      app = assemble();
+      app.use(pipeline());
+      app.use(generators());
+      app.use(compose());
+    });
+
+    it('should copy plugins from generator `abc` to `app`', function() {
+      app.register('abc', function(gen) {
+        gen.plugin('foo', function() {});
+        gen.plugin('bar', function() {});
+      });
+
+      app.compose(['abc'])
+        .pipeline();
+
+      assert.deepEqual(app.plugins, app.getGenerator('abc').plugins);
+    });
+
+    it('should throw an error when the `helper` api is not present', function(cb) {
+      app = new Base();
+      app.isApp = true;
+      app.use(generators());
+      app.use(compose());
+      app.register('a', function() {});
+      try {
+        app.compose(['a']).pipeline();
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert(err);
+        assert.equal(err.message, 'expected the base-pipeline plugin to be registered');
         cb();
       }
     });
@@ -210,6 +237,35 @@ describe('base-compose', function() {
         if (err) cb(err);
         assert.deepEqual(output, ['app: default']);
         assert.equal(count, 1);
+        cb();
+      });
+    });
+
+    it('should copy all tasks from `a` to `app`', function(cb) {
+      var count = 0;
+      var output = [];
+      app.name = 'app';
+      var a = app.register('a', function(a) {
+        a.task('default', function(cb) {
+          output.push(this.app.name + ': ' + this.name);
+          count++;
+          cb();
+        });
+
+        a.task('foo', function(cb) {
+          output.push(this.app.name + ': ' + this.name);
+          count++;
+          cb();
+        });
+      });
+
+      app.compose(['a'])
+        .tasks();
+
+      app.build(['default', 'foo'], function(err) {
+        if (err) cb(err);
+        assert.deepEqual(output, ['app: default', 'app: foo']);
+        assert.equal(count, 2);
         cb();
       });
     });
@@ -267,6 +323,7 @@ describe('base-compose', function() {
 
     it('should throw an error when the `task` api is not present', function(cb) {
       app = new Base();
+      app.isApp = true;
       app.use(generators());
       app.use(compose());
       delete app.task;
@@ -277,7 +334,7 @@ describe('base-compose', function() {
         cb(new Error('expected an error'));
       } catch (err) {
         assert(err);
-        assert.equal(err.message, '.tasks expects a ".task()" method from "base-task" on "app"');
+        assert.equal(err.message, 'expected the base-task plugin to be registered');
         cb();
       }
     });
@@ -393,6 +450,7 @@ describe('base-compose', function() {
 
     it('should throw an error when the `views` api is not present', function(cb) {
       app = new Base();
+      app.isApp = true;
       app.use(generators());
       app.use(compose());
       app.register('a', function() {});
@@ -401,7 +459,7 @@ describe('base-compose', function() {
         cb(new Error('expected an error'));
       } catch (err) {
         assert(err);
-        assert.equal(err.message, '.views expects the "app" to be inherited from "templates"');
+        assert.equal(err.message, '.views requires an instance of templates');
         cb();
       }
     });
@@ -448,7 +506,7 @@ describe('base-compose', function() {
         cb(new Error('expected an error'));
       } catch (err) {
         assert(err);
-        assert.equal(err.message, 'Invalid generator "a"');
+        assert.equal(err.message, 'generator "a" is not registered');
         assert.equal(count, 0);
         cb(null);
       }
