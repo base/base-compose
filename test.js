@@ -6,6 +6,7 @@ var Base = require('base').namespace('test');
 var assemble = require('assemble-core');
 var pipeline = require('base-pipeline');
 var generators = require('base-generators');
+var questions = require('base-questions');
 var compose = require('./');
 var app;
 
@@ -175,6 +176,79 @@ describe('base-compose', function() {
       } catch (err) {
         assert(err);
         assert.equal(err.message, '.helpers requires an instance of templates');
+        cb();
+      }
+    });
+  });
+
+  describe('questions', function() {
+    it('should copy questions from a generator to `app`', function() {
+      app.use(questions());
+
+      app.register('foo', function(foo) {
+        foo.question('first.name', 'What is your first name?');
+        foo.question('last.name', 'What is your last name?');
+      });
+
+      app.compose(['foo'])
+        .questions();
+
+      assert(app.questions.cache.hasOwnProperty('first.name'));
+      assert(app.questions.cache.hasOwnProperty('last.name'));
+    });
+
+    it('should copy questions from multiple generators to `app`', function() {
+      app.use(questions());
+
+      app.register('foo', function(foo) {
+        foo.question('first.name', 'What is your first name?');
+        foo.question('last.name', 'What is your last name?');
+      });
+
+      app.register('bar', function(bar) {
+        bar.question('project.name', 'What is the project name?');
+      });
+
+      app.compose(['foo', 'bar'])
+        .questions();
+
+      assert(app.questions.cache.hasOwnProperty('first.name'));
+      assert(app.questions.cache.hasOwnProperty('last.name'));
+      assert(app.questions.cache.hasOwnProperty('project.name'));
+    });
+
+    it('should not copy questions from unspecified generators', function() {
+      app.use(questions());
+
+      app.register('foo', function(foo) {
+        foo.question('first.name', 'What is your first name?');
+        foo.question('last.name', 'What is your last name?');
+      });
+
+      app.register('bar', function(bar) {
+        bar.question('project.name', 'What is the project name?');
+      });
+
+      app.compose(['foo'])
+        .questions();
+
+      assert(app.questions.cache.hasOwnProperty('first.name'));
+      assert(app.questions.cache.hasOwnProperty('last.name'));
+      assert(!app.questions.cache.hasOwnProperty('project.name'));
+    });
+
+    it('should throw an error when the `base-questions` plugin is not registered', function(cb) {
+      app = new Base();
+      app.isApp = true;
+      app.use(generators());
+      app.use(compose());
+      app.register('foo', function() {});
+      try {
+        app.compose('foo').questions();
+        cb(new Error('expected an error'));
+      } catch (err) {
+        assert(err);
+        assert.equal(err.message, 'expected the base-questions plugin to be registered');
         cb();
       }
     });
