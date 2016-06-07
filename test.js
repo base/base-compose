@@ -18,6 +18,7 @@ describe('base-compose', function() {
     base.use(compose());
 
     app = assemble();
+    app.parent = base;
     app.use(generators());
     app.use(compose());
   });
@@ -27,7 +28,18 @@ describe('base-compose', function() {
   });
 
   it('should not have any generators if none are passed', function() {
-    assert.deepEqual(app.compose(base).generators, []);
+    assert.deepEqual(app.compose().generators, []);
+  });
+
+  it('should use `base` when parent is not passed', function() {
+    assert.deepEqual(app.compose().src, base);
+  });
+
+  it('should allow passing in an array of generators and use `base` when parent is not passed', function() {
+    assert.deepEqual(app.compose('a').src, base);
+    assert.deepEqual(app.compose('a').generators, ['a']);
+    assert.deepEqual(app.compose().src, base);
+    assert.deepEqual(app.compose(['a', 'b', 'c']).generators, ['a', 'b', 'c']);
   });
 
   it('should throw an error when "base-generators" is not registered', function(cb) {
@@ -39,16 +51,6 @@ describe('base-compose', function() {
       cb(new Error('expected an error'));
     } catch (err) {
       assert.equal(err.message, 'expected the base-generators plugin to be registered');
-      cb();
-    }
-  });
-
-  it('should throw an error when "parent" is not passed in', function(cb) {
-    try {
-      app.compose();
-      cb(new Error('expected an error'));
-    } catch (err) {
-      assert.equal(err.message, 'expected the base-generators plugin to be registerd on "parent"');
       cb();
     }
   });
