@@ -22,7 +22,7 @@ module.exports = function(options) {
      * If a generator cannot be found, an error will be thrown.
      *
      * ```js
-     * app.compose(['a', 'b', 'c'])
+     * app.compose(base, ['a', 'b', 'c'])
      *   .data()
      *   .options()
      *   .helpers()
@@ -30,16 +30,21 @@ module.exports = function(options) {
      * ```
      *
      * @name .compose
+     * @param {Object} `parent` Parent generator to lookup generators.
      * @param {String|Array} `names` One or more generator names.
      * @return {Object} Returns an instance of `Compose`
      * @api public
      */
 
-    this.define('compose', function(names) {
+    this.define('compose', function(parent, names) {
       if (!this.isGenerator) {
         throw new Error('expected the base-generators plugin to be registered');
       }
-      return new Compose(this, utils.arrayify(names));
+      if (!parent || !parent.isGenerator) {
+        throw new Error('expected the base-generators plugin to be registerd on "parent"');
+      }
+
+      return new Compose(parent, this, utils.arrayify(names));
     });
   };
 };
