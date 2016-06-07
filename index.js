@@ -31,7 +31,7 @@ module.exports = function(options) {
      *
      * @name .compose
      * @param {Object} `parent` Parent generator to lookup generators.
-     * @param {String|Array} `names` One or more generator names.
+     * @param {String|Array} `names` One or more generator names or instances.
      * @return {Object} Returns an instance of `Compose`
      * @api public
      */
@@ -40,8 +40,13 @@ module.exports = function(options) {
       if (!this.isGenerator) {
         throw new Error('expected the base-generators plugin to be registered');
       }
-      if (!parent || !parent.isGenerator) {
-        throw new Error('expected the base-generators plugin to be registerd on "parent"');
+
+      if (parent && typeof parent === 'string' || Array.isArray(parent)) {
+        return this.compose(this.base, parent);
+      }
+
+      if (!parent) {
+        parent = this.base;
       }
 
       return new Compose(parent, this, utils.arrayify(names));
