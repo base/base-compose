@@ -1,6 +1,6 @@
 # base-compose [![NPM version](https://img.shields.io/npm/v/base-compose.svg?style=flat)](https://www.npmjs.com/package/base-compose) [![NPM downloads](https://img.shields.io/npm/dm/base-compose.svg?style=flat)](https://npmjs.org/package/base-compose) [![Build Status](https://img.shields.io/travis/node-base/base-compose.svg?style=flat)](https://travis-ci.org/node-base/base-compose)
 
-> Selectively merge values from one or more generators onto the current application instance.
+Selectively merge values from one or more generators onto the current application instance.
 
 ## Install
 
@@ -33,26 +33,27 @@ You don't need to register all of the plugins prescribed below, just use the plu
 
 More information is provided in the [methods documentation](#methods) below.
 
-### [.compose](index.js#L38)
+### [.compose](index.js#L39)
 
 Setup a composition by passing in an array of generators to compose elements. If a generator cannot be found, an error will be thrown.
 
 **Params**
 
+* `parent` **{Object}**: Parent generator to lookup generators.
 * `names` **{String|Array}**: One or more generator names.
 * `returns` **{Object}**: Returns an instance of `Compose`
 
 **Example**
 
 ```js
-app.compose(['a', 'b', 'c'])
+app.compose(base, ['a', 'b', 'c'])
   .data()
   .options()
   .helpers()
   .views();
 ```
 
-### [.compose.options](lib/compose.js#L41)
+### [.compose.options](lib/compose.js#L43)
 
 Merge the options from each generator into the `app` options. This method requires using the [base-option][base-option] plugin.
 
@@ -68,14 +69,14 @@ a.option({foo: 'a'});
 b.option({foo: 'b'});
 c.option({foo: 'c'});
 
-app.compose(['a', 'b', 'c'])
+app.compose(base, ['a', 'b', 'c'])
   .options();
 
 console.log(app.options);
 //=> {foo: 'c'}
 ```
 
-### [.compose.data](lib/compose.js#L73)
+### [.compose.data](lib/compose.js#L75)
 
 Merge the `cache.data` object from each generator onto the `app.cache.data` object. This method requires the `.data()` method from [templates](https://github.com/jonschlinkert/templates).
 
@@ -91,14 +92,14 @@ a.data({foo: 'a'});
 b.data({foo: 'b'});
 c.data({foo: 'c'});
 
-app.compose(['a', 'b', 'c'])
+app.compose(base, ['a', 'b', 'c'])
   .data();
 
 console.log(app.cache.data);
 //=> {foo: 'c'}
 ```
 
-### [.compose.engines](lib/compose.js#L102)
+### [.compose.engines](lib/compose.js#L104)
 
 Merge the engines from each generator into the `app` engines. This method requires the `.engine()` methods from [templates](https://github.com/jonschlinkert/templates).
 
@@ -107,11 +108,11 @@ Merge the engines from each generator into the `app` engines. This method requir
 **Example**
 
 ```js
-app.compose(['a', 'b', 'c'])
+app.compose(base, ['a', 'b', 'c'])
   .engines();
 ```
 
-### [.compose.helpers](lib/compose.js#L127)
+### [.compose.helpers](lib/compose.js#L129)
 
 Merge the helpers from each generator into `app.helpers`. Requires the `.helper` method from [templates](https://github.com/jonschlinkert/templates).
 
@@ -120,11 +121,24 @@ Merge the helpers from each generator into `app.helpers`. Requires the `.helper`
 **Example**
 
 ```js
-app.compose(['a', 'b', 'c'])
+app.compose(base, ['a', 'b', 'c'])
   .helpers();
 ```
 
-### [.compose.pipeline](lib/compose.js#L153)
+### [.compose.questions](lib/compose.js#L155)
+
+Merge `generator.questions.cache` from specified generators onto `app.questions.cache`. Requires the [base-questions][] plugin to be registered.
+
+* `returns` **{Object}**: Returns the `Compose` instance for chaining
+
+**Example**
+
+```js
+app.compose(base, ['a', 'b', 'c'])
+  .questions();
+```
+
+### [.compose.pipeline](lib/compose.js#L184)
 
 Merge the pipeline plugins from each generator onto `app.plugins`. Requires the [base-pipeline](https://github.com/node-base/base-pipeline) plugin to be registered.
 
@@ -133,11 +147,11 @@ Merge the pipeline plugins from each generator onto `app.plugins`. Requires the 
 **Example**
 
 ```js
-app.compose(['a', 'b', 'c'])
+app.compose(base, ['a', 'b', 'c'])
   .pipeline();
 ```
 
-### [.compose.tasks](lib/compose.js#L187)
+### [.compose.tasks](lib/compose.js#L218)
 
 Copy the specified tasks and task-dependencies from each generator onto `app.tasks`. Requires using the [base-task](https://github.com/node-base/base-task) plugin to be registered.
 
@@ -149,15 +163,15 @@ Copy the specified tasks and task-dependencies from each generator onto `app.tas
 **Example**
 
 ```js
-app.compose(['a', 'b', 'c'])
+app.compose(base, ['a', 'b', 'c'])
   .tasks(['foo', 'bar', 'default']);
 
 // or to copy all tasks
-app.compose(['a', 'b', 'c'])
+app.compose(base, ['a', 'b', 'c'])
   .tasks();
 ```
 
-### [.compose.views](lib/compose.js#L216)
+### [.compose.views](lib/compose.js#L247)
 
 Copy view collections and views from each generator onto `app`. Expects `app` to be an instance of [templates](https://github.com/jonschlinkert/templates).
 
@@ -170,11 +184,11 @@ Copy view collections and views from each generator onto `app`. Expects `app` to
 **Example**
 
 ```js
-app.compose(['a', 'b', 'c'])
+app.compose(base, ['a', 'b', 'c'])
   .views();
 ```
 
-### [.compose.iterator](lib/compose.js#L295)
+### [.compose.iterator](lib/compose.js#L326)
 
 Returns an iterator function for iterating over an array of generators. The iterator takes a `fn` that exposes the current generator being iterated over (`generator`) and the app passed into the original function as arguments. No binding is done within the iterator so the function passed in can be safely bound.
 
@@ -187,7 +201,7 @@ Returns an iterator function for iterating over an array of generators. The iter
 **Example**
 
 ```js
-app.compose(['a', 'b', 'c'])
+app.compose(base, ['a', 'b', 'c'])
   .iterator(function(generator, app) {
     // do work
     app.data(generator.cache.data);
@@ -196,7 +210,7 @@ app.compose(['a', 'b', 'c'])
 // optionally pass an array of additional generator names as the
 // first argument. If generator names are defined on `iterator`,
 // any names passed to `.compose()` will be ignored.
-app.compose(['a', 'b', 'c'])
+app.compose(base, ['a', 'b', 'c'])
   .iterator(['d', 'e', 'f'], function(generator, app) {
     // do stuff to `generator` and `app`
   });
@@ -236,7 +250,7 @@ You might also be interested in these projects:
 
 ## Contributing
 
-Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/doowb/base-compose/issues/new).
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/node-base/base-compose/issues/new).
 
 ## Building docs
 
@@ -274,4 +288,4 @@ Released under the [MIT license](https://github.com/node-base/base-compose/blob/
 
 ***
 
-_This file was generated by [verb](https://github.com/verbose/verb), v0.9.0, on April 21, 2016._
+_This file was generated by [verb](https://github.com/verbose/verb), v0.9.0, on June 07, 2016._
