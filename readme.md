@@ -40,7 +40,7 @@ Setup a composition by passing in an array of generators to compose elements. If
 **Params**
 
 * `parent` **{Object}**: Parent generator to lookup generators.
-* `names` **{String|Array}**: One or more generator names.
+* `names` **{String|Array}**: One or more generator names or instances.
 * `returns` **{Object}**: Returns an instance of `Compose`
 
 **Example**
@@ -127,7 +127,7 @@ app.compose(base, ['a', 'b', 'c'])
 
 ### [.compose.questions](lib/compose.js#L155)
 
-Merge `generator.questions.cache` from specified generators onto `app.questions.cache`. Requires the [base-questions][] plugin to be registered.
+Merge `generator.questions.cache` from specified generators onto `app.questions.cache`. Requires the [base-questions](https://github.com/node-base/base-questions) plugin to be registered.
 
 * `returns` **{Object}**: Returns the `Compose` instance for chaining
 
@@ -245,7 +245,7 @@ You might also be interested in these projects:
 
 * [assemble](https://www.npmjs.com/package/assemble): Assemble is a powerful, extendable and easy to use static site generator for node.js. Used… [more](https://www.npmjs.com/package/assemble) | [homepage](https://github.com/assemble/assemble)
 * [base](https://www.npmjs.com/package/base): base is the foundation for creating modular, unit testable and highly pluggable node.js applications, starting… [more](https://www.npmjs.com/package/base) | [homepage](https://github.com/node-base/base)
-* [generate](https://www.npmjs.com/package/generate): Fast, composable, highly extendable project generator with a user-friendly and expressive API. | [homepage](https://github.com/generate/generate)
+* [generate](https://www.npmjs.com/package/generate): Fast, composable, highly pluggable project generator with a user-friendly and expressive API. | [homepage](https://github.com/generate/generate)
 * [verb](https://www.npmjs.com/package/verb): Documentation generator for GitHub projects. Verb is extremely powerful, easy to use, and is used… [more](https://www.npmjs.com/package/verb) | [homepage](https://github.com/verbose/verb)
 
 ## Contributing
