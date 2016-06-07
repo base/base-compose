@@ -9,9 +9,14 @@ var generators = require('base-generators');
 var questions = require('base-questions');
 var compose = require('./');
 var app;
+var base;
 
 describe('base-compose', function() {
   beforeEach(function() {
+    base = assemble();
+    base.use(generators());
+    base.use(compose());
+
     app = assemble();
     app.use(generators());
     app.use(compose());
@@ -22,7 +27,7 @@ describe('base-compose', function() {
   });
 
   it('should not have any generators if none are passed', function() {
-    assert.deepEqual(app.compose().generators, []);
+    assert.deepEqual(app.compose(base).generators, []);
   });
 
   it('should throw an error when "base-generators" is not registered', function(cb) {
@@ -38,20 +43,30 @@ describe('base-compose', function() {
     }
   });
 
+  it('should throw an error when "parent" is not passed in', function(cb) {
+    try {
+      app.compose();
+      cb(new Error('expected an error'));
+    } catch (err) {
+      assert.equal(err.message, 'expected the base-generators plugin to be registerd on "parent"');
+      cb();
+    }
+  });
+
   describe('options', function() {
     it('should copy options from `a` to `app`', function() {
-      var a = app.register('a', function(a) {
+      var a = base.register('a', function(a) {
         a.option('foo', 'aaa');
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .options();
 
       assert.deepEqual(app.options, a.options);
     });
 
     it('should copy options from `a` to `app` specified by property path', function() {
-      app.register('a', function(a) {
+      base.register('a', function(a) {
         a.option({
           a: {
             b: {
@@ -66,7 +81,7 @@ describe('base-compose', function() {
         });
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .options('a.b.c');
 
       assert.deepEqual(app.options, {a: {b: {c: {d: 'e'}}}});
@@ -75,25 +90,25 @@ describe('base-compose', function() {
 
   describe('data', function() {
     it('should copy data from `a` to `app`', function() {
-      var a = app.register('a', function(a) {
+      var a = base.register('a', function(a) {
         a.data('foo', 'aaa');
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .data();
 
       assert.deepEqual(app.cache.data, a.cache.data);
     });
 
     it('should copy data from `a` to `app` specified by property path', function() {
-      app.register('a', function(a) {
+      base.register('a', function(a) {
         a.data({
           a: {b: {c: {d: 'e'}, c1: {d: 'e'}}, b1: {c1: {d: 'e'}}},
           a1: {b: {c: {d: 'e'}}}
         });
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .data('a.b.c');
 
       assert.deepEqual(app.cache.data, {a: {b: {c: {d: 'e'}}}});
@@ -104,9 +119,9 @@ describe('base-compose', function() {
       app.isApp = true;
       app.use(generators());
       app.use(compose());
-      app.register('a', function() {});
+      base.register('a', function() {});
       try {
-        app.compose(['a']).data();
+        app.compose(base, ['a']).data();
         cb(new Error('expected an error'));
       } catch (err) {
         assert(err);
@@ -118,12 +133,12 @@ describe('base-compose', function() {
 
   describe('engines', function() {
     it('should copy engines from `a` to `app`', function() {
-      var a = app.register('a', function(a) {
+      var a = base.register('a', function(a) {
         a.engine('hbs', require('engine-handlebars'));
         a.engine('tmpl', require('engine-base'));
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .engines();
 
       assert.deepEqual(app._.engines, a._.engines);
@@ -134,9 +149,9 @@ describe('base-compose', function() {
       app.isApp = true;
       app.use(generators());
       app.use(compose());
-      app.register('a', function() {});
+      base.register('a', function() {});
       try {
-        app.compose(['a']).engines();
+        app.compose(base, ['a']).engines();
         cb(new Error('expected an error'));
       } catch (err) {
         assert(err);
@@ -148,7 +163,7 @@ describe('base-compose', function() {
 
   describe('helpers', function() {
     it('should copy helpers from `a` to `app`', function() {
-      var a = app.register('a', function(a) {
+      var a = base.register('a', function(a) {
         a.helper('foo', function(str) {
           return str + ' FOO';
         });
@@ -158,7 +173,7 @@ describe('base-compose', function() {
         });
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .helpers();
 
       assert.deepEqual(app._.helpers, a._.helpers);
@@ -169,9 +184,9 @@ describe('base-compose', function() {
       app.isApp = true;
       app.use(generators());
       app.use(compose());
-      app.register('a', function() {});
+      base.register('a', function() {});
       try {
-        app.compose(['a']).helpers();
+        app.compose(base, ['a']).helpers();
         cb(new Error('expected an error'));
       } catch (err) {
         assert(err);
@@ -183,14 +198,15 @@ describe('base-compose', function() {
 
   describe('questions', function() {
     it('should copy questions from a generator to `app`', function() {
+      base.use(questions());
       app.use(questions());
 
-      app.register('foo', function(foo) {
+      base.register('foo', function(foo) {
         foo.question('first.name', 'What is your first name?');
         foo.question('last.name', 'What is your last name?');
       });
 
-      app.compose(['foo'])
+      app.compose(base, ['foo'])
         .questions();
 
       assert(app.questions.cache.hasOwnProperty('first.name'));
@@ -198,18 +214,19 @@ describe('base-compose', function() {
     });
 
     it('should copy questions from multiple generators to `app`', function() {
+      base.use(questions());
       app.use(questions());
 
-      app.register('foo', function(foo) {
+      base.register('foo', function(foo) {
         foo.question('first.name', 'What is your first name?');
         foo.question('last.name', 'What is your last name?');
       });
 
-      app.register('bar', function(bar) {
+      base.register('bar', function(bar) {
         bar.question('project.name', 'What is the project name?');
       });
 
-      app.compose(['foo', 'bar'])
+      app.compose(base, ['foo', 'bar'])
         .questions();
 
       assert(app.questions.cache.hasOwnProperty('first.name'));
@@ -218,18 +235,19 @@ describe('base-compose', function() {
     });
 
     it('should not copy questions from unspecified generators', function() {
+      base.use(questions());
       app.use(questions());
 
-      app.register('foo', function(foo) {
+      base.register('foo', function(foo) {
         foo.question('first.name', 'What is your first name?');
         foo.question('last.name', 'What is your last name?');
       });
 
-      app.register('bar', function(bar) {
+      base.register('bar', function(bar) {
         bar.question('project.name', 'What is the project name?');
       });
 
-      app.compose(['foo'])
+      app.compose(base, ['foo'])
         .questions();
 
       assert(app.questions.cache.hasOwnProperty('first.name'));
@@ -242,9 +260,9 @@ describe('base-compose', function() {
       app.isApp = true;
       app.use(generators());
       app.use(compose());
-      app.register('foo', function() {});
+      base.register('foo', function() {});
       try {
-        app.compose('foo').questions();
+        app.compose(base, 'foo').questions();
         cb(new Error('expected an error'));
       } catch (err) {
         assert(err);
@@ -256,6 +274,11 @@ describe('base-compose', function() {
 
   describe('pipeline plugins', function() {
     beforeEach(function() {
+      base = assemble();
+      base.use(pipeline());
+      base.use(generators());
+      base.use(compose());
+
       app = assemble();
       app.use(pipeline());
       app.use(generators());
@@ -263,15 +286,15 @@ describe('base-compose', function() {
     });
 
     it('should copy plugins from generator `abc` to `app`', function() {
-      app.register('abc', function(gen) {
+      base.register('abc', function(gen) {
         gen.plugin('foo', function() {});
         gen.plugin('bar', function() {});
       });
 
-      app.compose(['abc'])
+      app.compose(base, ['abc'])
         .pipeline();
 
-      assert.deepEqual(app.plugins, app.getGenerator('abc').plugins);
+      assert.deepEqual(app.plugins, base.getGenerator('abc').plugins);
     });
 
     it('should throw an error when the `helper` api is not present', function(cb) {
@@ -279,9 +302,9 @@ describe('base-compose', function() {
       app.isApp = true;
       app.use(generators());
       app.use(compose());
-      app.register('a', function() {});
+      base.register('a', function() {});
       try {
-        app.compose(['a']).pipeline();
+        app.compose(base, ['a']).pipeline();
         cb(new Error('expected an error'));
       } catch (err) {
         assert(err);
@@ -296,7 +319,7 @@ describe('base-compose', function() {
       var count = 0;
       var output = [];
       app.name = 'app';
-      app.register('a', function(a) {
+      base.register('a', function(a) {
         a.task('default', function(cb) {
           output.push(this.app.name + ': ' + this.name);
           count++;
@@ -304,7 +327,7 @@ describe('base-compose', function() {
         });
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .tasks('default');
 
       app.build('default', function(err) {
@@ -319,7 +342,7 @@ describe('base-compose', function() {
       var count = 0;
       var output = [];
       app.name = 'app';
-      app.register('a', function(a) {
+      base.register('a', function(a) {
         a.task('default', function(cb) {
           output.push(this.app.name + ': ' + this.name);
           count++;
@@ -333,7 +356,7 @@ describe('base-compose', function() {
         });
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .tasks();
 
       app.build(['default', 'foo'], function(err) {
@@ -348,7 +371,7 @@ describe('base-compose', function() {
       var count = 0;
       var output = [];
       app.name = 'app';
-      app.register('a', function(a) {
+      base.register('a', function(a) {
         a.task('foo', function(cb) {
           output.push(this.app.name + ': ' + this.name);
           count++;
@@ -362,7 +385,7 @@ describe('base-compose', function() {
         });
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .tasks('default');
 
       app.build('default', function(err) {
@@ -374,7 +397,7 @@ describe('base-compose', function() {
     });
 
     it('should throw an error when a task does not exist on `a`.', function(cb) {
-      app.register('a', function(a) {
+      base.register('a', function(a) {
         a.task('foo', function(cb) {
           cb();
         });
@@ -385,7 +408,7 @@ describe('base-compose', function() {
       });
 
       try {
-        app.compose(['a'])
+        app.compose(base, ['a'])
           .tasks(['foo', 'bar']);
         cb(new Error('expected an error'));
       } catch (err) {
@@ -402,9 +425,9 @@ describe('base-compose', function() {
       app.use(compose());
       delete app.task;
 
-      app.register('a', function() {});
+      base.register('a', function() {});
       try {
-        app.compose(['a']).tasks();
+        app.compose(base, ['a']).tasks();
         cb(new Error('expected an error'));
       } catch (err) {
         assert(err);
@@ -416,12 +439,12 @@ describe('base-compose', function() {
 
   describe('views', function() {
     it('should copy views from `a` to `app`', function() {
-      app.register('a', function(a) {
+      base.register('a', function(a) {
         a.create('templates');
         a.template('foo', {content: 'foo'});
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .views();
 
       assert.equal(typeof app.template, 'function');
@@ -433,12 +456,12 @@ describe('base-compose', function() {
     it('should only copy collections from `a` to `app` that are not already on `app`', function() {
       app.create('templates');
       app.template('bar', {content: 'bar'});
-      app.register('a', function(a) {
+      base.register('a', function(a) {
         a.create('templates');
         a.template('foo', {content: 'foo'});
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .views();
 
       assert.equal(typeof app.template, 'function');
@@ -449,7 +472,7 @@ describe('base-compose', function() {
     });
 
     it('should only copy specified collections from `a` to `app`', function() {
-      app.register('a', function(a) {
+      base.register('a', function(a) {
         a.create('templates');
         a.template('foo.hbs', {content: 'foo'});
 
@@ -457,7 +480,7 @@ describe('base-compose', function() {
         a.file('foo.md', {content: 'foo'});
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .views(['files']);
 
       assert.equal(typeof app.template, 'undefined');
@@ -470,7 +493,7 @@ describe('base-compose', function() {
     });
 
     it('should only copy filtered views from specified collections from `a` to `app`', function() {
-      app.register('a', function(a) {
+      base.register('a', function(a) {
         a.create('templates');
         a.template('foo.hbs', {content: 'foo'});
 
@@ -479,7 +502,7 @@ describe('base-compose', function() {
         a.file('bar.md', {content: 'bar'});
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .views(['files'], function(key, view) {
           return key.indexOf('foo') !== -1;
         });
@@ -495,7 +518,7 @@ describe('base-compose', function() {
     });
 
     it('should only copy filtered views from all collections from `a` to `app`', function() {
-      app.register('a', function(a) {
+      base.register('a', function(a) {
         a.create('templates');
         a.template('foo.hbs', {content: 'foo'});
         a.template('bar.hbs', {content: 'bar'});
@@ -505,7 +528,7 @@ describe('base-compose', function() {
         a.file('bar.md', {content: 'bar'});
       });
 
-      app.compose(['a'])
+      app.compose(base, ['a'])
         .views(function(key, view) {
           return key.indexOf('foo') !== -1;
         });
@@ -527,9 +550,9 @@ describe('base-compose', function() {
       app.isApp = true;
       app.use(generators());
       app.use(compose());
-      app.register('a', function() {});
+      base.register('a', function() {});
       try {
-        app.compose(['a']).views();
+        app.compose(base, ['a']).views();
         cb(new Error('expected an error'));
       } catch (err) {
         assert(err);
@@ -541,12 +564,12 @@ describe('base-compose', function() {
 
   describe('iterator', function() {
     it('should allow using the iterator with the currently loaded generators', function() {
-      app.register('a', function(a) {});
-      app.register('b', function(b) {});
+      base.register('a', function(a) {});
+      base.register('b', function(b) {});
 
       var output = [];
 
-      app.compose(['a', 'b'])
+      app.compose(base, ['a', 'b'])
         .iterator(function(gen) {
           output.push(gen.name);
         });
@@ -555,15 +578,47 @@ describe('base-compose', function() {
     });
 
     it('should allow using the iterator with the custom specified generators', function() {
-      app.register('a', function(a) {});
-      app.register('b', function(b) {});
-      app.register('c', function(c) {});
-      app.register('d', function(d) {});
+      base.register('a', function(a) {});
+      base.register('b', function(b) {});
+      base.register('c', function(c) {});
+      base.register('d', function(d) {});
 
       var output = [];
 
-      app.compose(['a', 'b'])
+      app.compose(base, ['a', 'b'])
         .iterator(['c', 'd'], function(gen) {
+          output.push(gen.name);
+        });
+
+      assert.deepEqual(output, ['c', 'd']);
+    });
+
+    it('should allow using the iterator with generator instances', function() {
+      base.register('a', function(a) {});
+      base.register('b', function(b) {});
+      base.register('c', function(c) {});
+      base.register('d', function(d) {});
+
+      var output = [];
+
+      app.compose(base, ['a', base.getGenerator('b')])
+        .iterator(function(gen) {
+          output.push(gen.name);
+        });
+
+      assert.deepEqual(output, ['a', 'b']);
+    });
+
+    it('should allow using the iterator with custom generator instances', function() {
+      base.register('a', function(a) {});
+      base.register('b', function(b) {});
+      base.register('c', function(c) {});
+      base.register('d', function(d) {});
+
+      var output = [];
+
+      app.compose(base, ['a', base.getGenerator('b')])
+        .iterator(['c', base.getGenerator('d')], function(gen) {
           output.push(gen.name);
         });
 
@@ -573,7 +628,7 @@ describe('base-compose', function() {
     it('should throw an error when a generator is not found', function(cb) {
       var count = 0;
       try {
-        app.compose('a')
+        app.compose(base, 'a')
           .iterator(function(gen, app) {
             count++;
           });
@@ -584,6 +639,21 @@ describe('base-compose', function() {
         assert.equal(count, 0);
         cb(null);
       }
+    });
+
+    it('should emit an error when a generator is not found', function(cb) {
+      var count = 0;
+      app.on('error', function(err) {
+        assert.equal(count, 0);
+        assert(err);
+        assert.equal(err.message, 'generator "a" is not registered');
+        cb(null);
+      });
+
+      app.compose(base, 'a')
+        .iterator(function(gen, app) {
+          count++;
+        });
     });
   });
 });
