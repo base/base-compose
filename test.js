@@ -32,13 +32,13 @@ describe('base-compose', function() {
   });
 
   it('should use `base` when parent is not passed', function() {
-    assert.deepEqual(app.compose().src, base);
+    assert.deepEqual(app.compose().provider, base);
   });
 
   it('should allow passing in an array of generators and use `base` when parent is not passed', function() {
-    assert.deepEqual(app.compose('a').src, base);
+    assert.deepEqual(app.compose('a').provider, base);
     assert.deepEqual(app.compose('a').generators, ['a']);
-    assert.deepEqual(app.compose().src, base);
+    assert.deepEqual(app.compose().provider, base);
     assert.deepEqual(app.compose(['a', 'b', 'c']).generators, ['a', 'b', 'c']);
   });
 
@@ -122,6 +122,7 @@ describe('base-compose', function() {
       app.use(generators());
       app.use(compose());
       base.register('a', function() {});
+      delete app.data;
       try {
         app.compose(base, ['a']).data();
         cb(new Error('expected an error'));
@@ -288,15 +289,16 @@ describe('base-compose', function() {
     });
 
     it('should copy plugins from generator `abc` to `app`', function() {
-      base.register('abc', function(gen) {
-        gen.plugin('foo', function() {});
-        gen.plugin('bar', function() {});
+      base.register('abc', function(app) {
+        app.plugin('foo', function() {});
+        app.plugin('bar', function() {});
       });
 
       app.compose(base, ['abc'])
         .pipeline();
 
-      assert.deepEqual(app.plugins, base.getGenerator('abc').plugins);
+      assert(base.generators.abc.plugins.hasOwnProperty('foo'));
+      assert(base.generators.abc.plugins.hasOwnProperty('bar'));
     });
 
     it('should throw an error when the `helper` api is not present', function(cb) {
