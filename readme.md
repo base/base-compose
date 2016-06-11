@@ -7,7 +7,7 @@ Selectively merge values from one or more generators onto the current applicatio
 Install with [npm](https://www.npmjs.com/):
 
 ```sh
-$ npm install base-compose --save
+$ npm install --save base-compose
 ```
 
 This plugin requires the [base-generators](https://github.com/node-base/base-generators) to be registered first. If not already registered, you can do so now by following [these instructions](#base-generators).
@@ -53,7 +53,7 @@ app.compose(base, ['a', 'b', 'c'])
   .views();
 ```
 
-### [.compose.options](lib/compose.js#L43)
+### [.compose.options](lib/compose.js#L44)
 
 Merge the options from each generator into the `app` options. This method requires using the [base-option][base-option] plugin.
 
@@ -76,7 +76,7 @@ console.log(app.options);
 //=> {foo: 'c'}
 ```
 
-### [.compose.data](lib/compose.js#L75)
+### [.compose.data](lib/compose.js#L76)
 
 Merge the `cache.data` object from each generator onto the `app.cache.data` object. This method requires the `.data()` method from [templates](https://github.com/jonschlinkert/templates).
 
@@ -99,7 +99,7 @@ console.log(app.cache.data);
 //=> {foo: 'c'}
 ```
 
-### [.compose.engines](lib/compose.js#L104)
+### [.compose.engines](lib/compose.js#L105)
 
 Merge the engines from each generator into the `app` engines. This method requires the `.engine()` methods from [templates](https://github.com/jonschlinkert/templates).
 
@@ -112,7 +112,7 @@ app.compose(base, ['a', 'b', 'c'])
   .engines();
 ```
 
-### [.compose.helpers](lib/compose.js#L129)
+### [.compose.helpers](lib/compose.js#L130)
 
 Merge the helpers from each generator into `app.helpers`. Requires the `.helper` method from [templates](https://github.com/jonschlinkert/templates).
 
@@ -125,7 +125,7 @@ app.compose(base, ['a', 'b', 'c'])
   .helpers();
 ```
 
-### [.compose.questions](lib/compose.js#L155)
+### [.compose.questions](lib/compose.js#L156)
 
 Merge `generator.questions.cache` from specified generators onto `app.questions.cache`. Requires the [base-questions](https://github.com/node-base/base-questions) plugin to be registered.
 
@@ -138,7 +138,7 @@ app.compose(base, ['a', 'b', 'c'])
   .questions();
 ```
 
-### [.compose.pipeline](lib/compose.js#L184)
+### [.compose.pipeline](lib/compose.js#L185)
 
 Merge the pipeline plugins from each generator onto `app.plugins`. Requires the [base-pipeline](https://github.com/node-base/base-pipeline) plugin to be registered.
 
@@ -151,7 +151,7 @@ app.compose(base, ['a', 'b', 'c'])
   .pipeline();
 ```
 
-### [.compose.tasks](lib/compose.js#L218)
+### [.compose.tasks](lib/compose.js#L217)
 
 Copy the specified tasks and task-dependencies from each generator onto `app.tasks`. Requires using the [base-task](https://github.com/node-base/base-task) plugin to be registered.
 
@@ -171,7 +171,7 @@ app.compose(base, ['a', 'b', 'c'])
   .tasks();
 ```
 
-### [.compose.views](lib/compose.js#L247)
+### [.compose.views](lib/compose.js#L246)
 
 Copy view collections and views from each generator onto `app`. Expects `app` to be an instance of [templates](https://github.com/jonschlinkert/templates).
 
@@ -188,7 +188,7 @@ app.compose(base, ['a', 'b', 'c'])
   .views();
 ```
 
-### [.compose.iterator](lib/compose.js#L326)
+### [.compose.iterator](lib/compose.js#L325)
 
 Returns an iterator function for iterating over an array of generators. The iterator takes a `fn` that exposes the current generator being iterated over (`generator`) and the app passed into the original function as arguments. No binding is done within the iterator so the function passed in can be safely bound.
 
@@ -243,27 +243,23 @@ app.use(compose());
 
 You might also be interested in these projects:
 
-* [assemble](https://www.npmjs.com/package/assemble): Assemble is a powerful, extendable and easy to use static site generator for node.js. Used… [more](https://www.npmjs.com/package/assemble) | [homepage](https://github.com/assemble/assemble)
-* [base](https://www.npmjs.com/package/base): base is the foundation for creating modular, unit testable and highly pluggable node.js applications, starting… [more](https://www.npmjs.com/package/base) | [homepage](https://github.com/node-base/base)
-* [generate](https://www.npmjs.com/package/generate): Fast, composable, highly pluggable project generator with a user-friendly and expressive API. | [homepage](https://github.com/generate/generate)
-* [verb](https://www.npmjs.com/package/verb): Documentation generator for GitHub projects. Verb is extremely powerful, easy to use, and is used… [more](https://www.npmjs.com/package/verb) | [homepage](https://github.com/verbose/verb)
+* [assemble](https://www.npmjs.com/package/assemble): Assemble is a powerful, extendable and easy to use static site generator for node.js. Used… [more](https://github.com/assemble/assemble) | [homepage](https://github.com/assemble/assemble "Assemble is a powerful, extendable and easy to use static site generator for node.js. Used by thousands of projects for much more than building websites, Assemble is also used for creating themes, scaffolds, boilerplates, e-books, UI components, API docum")
+* [base](https://www.npmjs.com/package/base): base is the foundation for creating modular, unit testable and highly pluggable node.js applications, starting… [more](https://github.com/node-base/base) | [homepage](https://github.com/node-base/base "base is the foundation for creating modular, unit testable and highly pluggable node.js applications, starting with a handful of common methods, like `set`, `get`, `del` and `use`.")
+* [generate](https://www.npmjs.com/package/generate): Fast, composable, highly pluggable project generator with a user-friendly and expressive API. | [homepage](https://github.com/generate/generate "Fast, composable, highly pluggable project generator with a user-friendly and expressive API.")
+* [verb](https://www.npmjs.com/package/verb): Documentation generator for GitHub projects. Verb is extremely powerful, easy to use, and is used… [more](https://github.com/verbose/verb) | [homepage](https://github.com/verbose/verb "Documentation generator for GitHub projects. Verb is extremely powerful, easy to use, and is used on hundreds of projects of all sizes to generate everything from API docs to readmes.")
 
 ## Contributing
 
-Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](https://github.com/node-base/base-compose/issues/new).
+This document was generated by [verb-readme-generator](https://github.com/verbose/verb-readme-generator) (a [verb](https://github.com/verbose/verb) generator), please don't edit directly. Any changes to the readme must be made in [.verb.md](.verb.md). See [Building Docs](#building-docs).
+
+Pull requests and stars are always welcome. For bugs and feature requests, [please create an issue](../../issues/new). Or visit the [verb-readme-generator](https://github.com/verbose/verb-readme-generator) project to submit bug reports or pull requests for the readme layout template.
 
 ## Building docs
 
 Generate readme and API documentation with [verb](https://github.com/verbose/verb):
 
 ```sh
-$ npm install verb && npm run docs
-```
-
-Or, if [verb](https://github.com/verbose/verb) is installed globally:
-
-```sh
-$ verb
+$ npm install -g verb verb-readme-generator && verb
 ```
 
 ## Running tests
@@ -288,4 +284,4 @@ Released under the [MIT license](https://github.com/node-base/base-compose/blob/
 
 ***
 
-_This file was generated by [verb](https://github.com/verbose/verb), v0.9.0, on June 07, 2016._
+_This file was generated by [verb](https://github.com/verbose/verb), v0.9.0, on June 11, 2016._
